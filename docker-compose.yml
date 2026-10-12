@@ -1,0 +1,38 @@
+
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: jobmate-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: jobmate123
+      MYSQL_DATABASE: jobmate_db
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: jobmate-backend
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/jobmate_db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: jobmate123
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: jobmate-frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:
